@@ -1,5 +1,7 @@
 package com.cfranc.irc;
 
+
+// mot clé pour les commandes IRC
 public interface IfClientServerProtocol {
 	public static final String LOGIN_PWD = "#Login?#Pseudo?#Pwd?";
 	public static final String SEPARATOR="#";
