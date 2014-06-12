@@ -65,6 +65,7 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 			ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
 			clientThread.post(DEL+user.getPseudo());
 		}
+		// c'est ici qu'il faudra coder la suppression du noeud dans le modèle
 	}
 	
 	
