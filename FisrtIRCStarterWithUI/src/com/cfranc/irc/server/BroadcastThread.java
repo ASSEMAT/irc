@@ -1,0 +1,78 @@
+package com.cfranc.irc.server;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import com.cfranc.irc.IfClientServerProtocol;
+
+public class BroadcastThread extends Thread implements IfClientServerProtocol{
+	
+	public static HashMap<User, ServerToClientThread> clientTreadsMap=new HashMap<User, ServerToClientThread>();
+	static{
+		Collections.synchronizedMap(clientTreadsMap);
+	}
+	
+	public static boolean addClient(User user, ServerToClientThread serverToClientThread){
+		boolean res=true;
+		if(clientTreadsMap.containsKey(user)){
+			res=false;
+		}
+		else{
+			clientTreadsMap.put(user, serverToClientThread);
+			Collection<ServerToClientThread> clientTreads=clientTreadsMap.values();
+			Iterator<ServerToClientThread> receiverClientThreadIterator=clientTreads.iterator();
+			
+			// recupération de la liste des clients depuis le Hash MAP
+			Collection<User> users=clientTreadsMap.keySet();
+			
+			// Envoie à tous les utilisateurs de l'arrivée d'un nouvel arrivant
+			while (receiverClientThreadIterator.hasNext()) {
+				ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
+				clientThread.post(ADD+user.getPseudo());
+			}
+			
+			// Envoie à l'arrivant de la liste des utilisateurs déjà connectés.
+			for (User userExistant  : users) {
+				if (userExistant != user) {
+					serverToClientThread.post(ADD+userExistant.getPseudo());
+				}
+			}
+		}
+		return res;
+	}
+
+	public static void sendMessage(User sender, String msg){
+		Collection<ServerToClientThread> clientTreads=clientTreadsMap.values();
+		Iterator<ServerToClientThread> receiverClientThreadIterator=clientTreads.iterator();
+		while (receiverClientThreadIterator.hasNext()) {
+			ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
+			clientThread.post("#"+sender.getPseudo()+"#"+msg);
+			System.out.println("sendMessage : "+"#"+sender.getLogin()+"#"+msg);
+		}
+	}
+	
+	public static void removeClient(User user){
+		clientTreadsMap.remove(user);
+		
+		Collection<ServerToClientThread> clientTreads=clientTreadsMap.values();
+		Iterator<ServerToClientThread> receiverClientThreadIterator=clientTreads.iterator();
+
+		// Envoie à tous les utilisateurs du départ d'un client
+		while (receiverClientThreadIterator.hasNext()) {
+			ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
+			clientThread.post(DEL+user.getPseudo());
+		}
+	}
+	
+	
+	public static boolean accept(User user){
+		boolean res=true;
+		if(clientTreadsMap.containsKey(user)){
+			res= false;
+		}
+		return res;
+	}
+}
