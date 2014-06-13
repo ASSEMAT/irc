@@ -14,25 +14,26 @@ public class UserGestion extends User {
 
 	String prenom;
 	String pic;
-	
+
 	public UserGestion(String login, String pseudo, String pwd, String prenom, String pic) {
 		super(login, pseudo, pwd);
 		this.prenom = prenom;
 		this.pic = pic;
 	}
+	
 
 	public void addUser()
 
 	{
 		// methode pour créer un USER dans la bdd via ConMySql
-		
+
 		try {
 			Connection con=ConMySql.getInst().getConn();
-			
+
 			Statement s=con.createStatement();
 			s.setQueryTimeout(30); 
 			ResultSet rs=s.executeQuery("SELECT NOM, PSEUDO FROM TUSERS");
-			
+
 			while (rs.next())
 			{
 				if ((this.getLogin().equals(rs.getString(1)))|| (this.getPseudo().equals(rs.getString(2))))
@@ -54,25 +55,25 @@ public class UserGestion extends User {
 			ps.executeUpdate();
 
 			JOptionPane.showMessageDialog(null,"User enregistré.");
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void delUser()
 
 	{
 		// methode pour sucrer un USER dans la bdd via ConMySql
-		
+
 		try {
 			Connection con=ConMySql.getInst().getConn();
-			
+
 			Statement s=con.createStatement();
 			s.setQueryTimeout(30); 
 			ResultSet rs=s.executeQuery("SELECT idTusers, NOM, PSEUDO FROM TUSERS");
-			
+
 			while (rs.next())
 			{
 				if ((rs.getString(2)==this.getLogin()) && (rs.getString(3)==this.getPseudo()))
@@ -83,7 +84,6 @@ public class UserGestion extends User {
 					ps.executeUpdate();
 					ps.close();
 					JOptionPane.showMessageDialog(null,"Utilisateur '"+this.getLogin()+"' supprimé.");
-
 				}
 			}
 		} catch (SQLException e) {
@@ -91,5 +91,33 @@ public class UserGestion extends User {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public boolean existeUser()
+	{
+		// returne TRUE si le couple LOGIN et PWD est présent dans la BDD
+		
+		try {
+			Connection con=ConMySql.getInst().getConn();
+
+			Statement s=con.createStatement();
+			s.setQueryTimeout(30); 
+			ResultSet rs=s.executeQuery("SELECT NOM, PWD FROM TUSERS");
+
+			while (rs.next())
+			{
+				if ((rs.getString(1)==this.getLogin()) && (rs.getString(2)==this.getPwd()))
+				{
+					System.out.println(rs.getString(1)+"/"+rs.getString(2)+" : user authentifié.");
+					rs.close();
+					return true;				
+				}
+			}
+			return false;
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
 }
