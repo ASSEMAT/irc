@@ -1,4 +1,5 @@
 package com.cfranc.irc.server;
+//DASS
 
 public class User {
 
@@ -67,7 +68,6 @@ public class User {
 		this.pwd = pwd;
 	}
 	
-
 	User(String login, String pseudo, String pwd) {
 		super();
 		this.login = login;
