@@ -5,27 +5,26 @@ import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 
 public class SimpleChatFrameServer extends JFrame{
 
 	public StyledDocument model=null;
 	public DefaultMutableTreeNode racine = new DefaultMutableTreeNode("Root");
 	public DefaultTreeModel clientListModel = new DefaultTreeModel(racine);
-
+	
 
 	public SimpleChatFrameServer(int port, StyledDocument model,  DefaultTreeModel clientListModel) {
 		super("ISM - IRC Server Manager");
@@ -62,7 +61,7 @@ public class SimpleChatFrameServer extends JFrame{
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
 		final JTree list = new JTree(clientListModel);
-	    list.setRootVisible(false);
+	    list.setRootVisible(true);
 		list.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 
@@ -83,4 +82,6 @@ public class SimpleChatFrameServer extends JFrame{
 	public DefaultMutableTreeNode getRoot(){
 		return racine;
 	}
+	
+
 }

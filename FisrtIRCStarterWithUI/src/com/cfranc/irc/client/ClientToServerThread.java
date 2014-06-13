@@ -12,6 +12,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cfranc.irc.IfClientServerProtocol;
 import com.cfranc.irc.ui.SimpleChatClientApp;
@@ -22,7 +23,7 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 	private DataInputStream streamIn = null;
 	private BufferedReader console = null;
 	String login,pwd, pseudo;
-	DefaultListModel<String> clientListModel;
+	static DefaultListModel<String> clientListModel;
 	StyledDocument documentModel;
 	
 	public ClientToServerThread(StyledDocument documentModel, DefaultListModel<String> clientListModel, Socket socket, String login, String pwd, String pseudo) {
@@ -34,6 +35,8 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 		this.pwd=pwd;
 		this.pseudo=pseudo;
 	}
+
+
 	
 	public void open() throws IOException {
 		console = new BufferedReader(new InputStreamReader(System.in));

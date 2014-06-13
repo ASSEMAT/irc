@@ -21,7 +21,7 @@ import com.sun.security.ntlm.Client;
 public class ClientConnectThread extends Thread implements IfClientServerProtocol {
 	StyledDocument model=null;
 	
-	DefaultTreeModel clientListModel;
+	static DefaultTreeModel clientListModel;
 	
 	private boolean canStop=false;
 	private ServerSocket server = null;
@@ -37,6 +37,21 @@ public class ClientConnectThread extends Thread implements IfClientServerProtoco
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
+	public static void RemoveNode (String nodeName){
+	
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)clientListModel.getRoot();
+		for (int i = 0; i < root.getChildCount(); i++) {
+			if (root.getChildAt(i).toString().equals(nodeName)) {
+				root.remove(i);
+				break;
+			}
+		}
+		clientListModel.reload();
+	}
+
 	
 	public ClientConnectThread(int port, StyledDocument model, DefaultTreeModel clientListModel) {
 		try {
@@ -99,8 +114,8 @@ public class ClientConnectThread extends Thread implements IfClientServerProtoco
 			if(BroadcastThread.addClient(newUser, client)){
 				client.start();		
 								
-				DefaultMutableTreeNode nom = new DefaultMutableTreeNode("Nom: "+newUser.getLogin());
-				DefaultMutableTreeNode pseudoNode = new DefaultMutableTreeNode("Pseudo: "+newUser.getPseudo());
+				DefaultMutableTreeNode nom = new DefaultMutableTreeNode(newUser.getLogin());
+				DefaultMutableTreeNode pseudoNode = new DefaultMutableTreeNode(newUser.getPseudo());
 				((DefaultMutableTreeNode)clientListModel.getRoot()).add(nom);
 				nom.add(pseudoNode);
 				clientListModel.reload();
