@@ -5,6 +5,7 @@ public class User {
 	private String login;
 	private String pwd;
 	private String pseudo;
+
 	
 	public String getPseudo() {
 		return pseudo;
@@ -29,11 +30,12 @@ public class User {
 	 * @param pwd
 	 * @param pseudo
 	 */
-	User(String login, String pseudo, String pwd ) {
+	User(String login, String pseudo, String pwd) {
 		super();
 		this.login = login;
 		this.pwd = pwd;
 		this.pseudo = pseudo;
+
 	}
 	
 

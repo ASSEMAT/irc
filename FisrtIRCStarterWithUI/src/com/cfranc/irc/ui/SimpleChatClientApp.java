@@ -23,7 +23,7 @@ import com.cfranc.irc.client.ClientToServerThread;
 import com.cfranc.irc.server.ClientConnectThread;
 
 public class SimpleChatClientApp {
-    static String[] ConnectOptionNames = { "Connect" };	
+    static String[] ConnectOptionNames = { "Connect", "Sign in" };	
     static String   ConnectTitle = "Connection Information";
     Socket socketClientServer;
     int serverPort;
@@ -125,16 +125,34 @@ public class SimpleChatClientApp {
 	
     void displayConnectionDialog() {
     	ConnectionPanel connectionPanel=new ConnectionPanel();
-		if (JOptionPane.showOptionDialog(null, connectionPanel, ConnectTitle,
+    	
+    	int result=JOptionPane.showOptionDialog(null, connectionPanel, ConnectTitle,
 				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
-				null, ConnectOptionNames, ConnectOptionNames[0]) == 0) {
+				null, ConnectOptionNames, ConnectOptionNames);
+    	
+		if (result == 0) {
+			
+			System.out.println(result);
 			serverPort=Integer.parseInt(connectionPanel.getServerPortField().getText());
 			serverName=connectionPanel.getServerField().getText();
 			clientName=connectionPanel.getUserNameField().getText();
 			clientPwd=connectionPanel.getPasswordField().getText();
 			clientPseudo =connectionPanel.getPseudoField().getText();
-			
+		
 		}
+		
+		if (result==1)
+		{
+			System.out.println(result);
+			FrameSignUser f=new FrameSignUser();
+			f.setVisible(true);
+			while (f.isActive())
+			{
+				System.out.println("a");
+			}
+
+		}
+
 	}
     
     private void connectClient() {
@@ -162,10 +180,11 @@ public class SimpleChatClientApp {
 			public void run() {
 				try {
 					app.displayConnectionDialog();
-
+					
 					app.connectClient();
 					
 					app.displayClient();
+					
 
 				} catch (Exception e) {
 					e.printStackTrace();
