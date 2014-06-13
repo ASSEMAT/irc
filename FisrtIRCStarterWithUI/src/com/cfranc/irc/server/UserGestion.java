@@ -12,16 +12,17 @@ import com.cfranc.irc.ConMySql;
 
 public class UserGestion extends User {
 
-	String prenom;
-	String pic;
 
 	public UserGestion(String login, String pseudo, String pwd, String prenom, String pic) {
-		super(login, pseudo, pwd);
-		this.prenom = prenom;
-		this.pic = pic;
+		super(login, pseudo, pwd, prenom, pic);
 	}
 	
 
+	public UserGestion(String login, String pwd) {
+		super(login, pwd);
+	}
+
+	
 	public void addUser()
 
 	{
@@ -48,10 +49,10 @@ public class UserGestion extends User {
 			System.out.println("avant");
 			PreparedStatement ps=con.prepareStatement(query);
 			ps.setString(1,this.getLogin());
-			ps.setString(2,this.getLogin());
+			ps.setString(2,this.getPrenom());
 			ps.setString(3,this.getPseudo());
 			ps.setString(4,this.getPwd());	
-			ps.setString(5,this.pic);	
+			ps.setString(5,this.getPic());	
 			ps.executeUpdate();
 
 			JOptionPane.showMessageDialog(null,"User enregistré.");
