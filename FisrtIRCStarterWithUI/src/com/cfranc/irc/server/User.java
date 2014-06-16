@@ -87,6 +87,10 @@ public class User {
 	User() {
 		super();
 	}
+	@Override
+	public String toString() {
+		return pseudo;
+	}
 
 	
 }
