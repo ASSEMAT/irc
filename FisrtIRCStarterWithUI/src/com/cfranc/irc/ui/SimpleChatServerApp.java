@@ -31,6 +31,7 @@ public class SimpleChatServerApp {
 			e.printStackTrace();
 		}
 		((JFrame)this.frame).setVisible(true);
+		frame.setAlwaysOnTop(true);
 		
 		// Start connection services
 		this.clientConnectThread=new ClientConnectThread(port, this.model, clientListModel);

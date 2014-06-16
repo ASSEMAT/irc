@@ -69,6 +69,7 @@ public class SimpleChatFrameClient extends JFrame {
 	private final ResourceAction lockAction = new LockAction();
 	private final ResourceAction AffichageToolbarAction = new AffichageToolbarAction();
 	private  JImagePanel panelPicture;
+	private String pseudoReception="";
 	
 	private boolean isScrollLocked=true;
 
@@ -107,7 +108,8 @@ public class SimpleChatFrameClient extends JFrame {
 	}
 	
 	public void sendMessage() {
-		sender.setMsgToSend(textField.getText());
+		System.out.println("send message : " +  pseudoReception);
+		sender.setMsgToSend(textField.getText(),pseudoReception);
 	}
 
 	public void close() {
@@ -181,6 +183,7 @@ public class SimpleChatFrameClient extends JFrame {
 					getLblSender().setText(senderName);
 					getPanelPicture().setImage(new ImageIcon(listModel.getElementAt(iFirstSelectedElement).getPic()).getImage());
 					repaint();
+					pseudoReception = senderName;
 				}
 				else{
 					getLblSender().setText("?"); //$NON-NLS-1$
@@ -279,6 +282,7 @@ public class SimpleChatFrameClient extends JFrame {
 		panelPicture.setSize(dim);
 		panel_2.add(panelPicture);
 		
+		this.setAlwaysOnTop(true);
 	}
 
 	public JLabel getLblSender() {
