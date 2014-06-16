@@ -13,7 +13,7 @@ public class ConMySql
 	private ConMySql() throws SQLException {
 		try {
 			String s="jdbc:mysql://localhost:3306/irc";
-			conn = DriverManager.getConnection(s,"root","kxy29ac7");
+			conn = DriverManager.getConnection(s,"root","root");
 		}
 		catch (SQLException e){
 			System.err.println(e.getMessage());

@@ -2,6 +2,8 @@ package com.cfranc.irc.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -12,7 +14,6 @@ import java.util.Scanner;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -20,9 +21,9 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import com.cfranc.irc.client.ClientToServerThread;
-import com.cfranc.irc.server.ClientConnectThread;
+import com.cfranc.irc.server.UserGestion;
 
-public class SimpleChatClientApp {
+public class SimpleChatClientApp implements ActionListener {
     static String[] ConnectOptionNames = { "Connect", "Sign in" };	
     static String   ConnectTitle = "Connection Information";
     Socket socketClientServer;
@@ -31,8 +32,11 @@ public class SimpleChatClientApp {
     String clientName;
     String clientPwd;
     String clientPseudo;
-    
+    private connectionDialog frameDialog; 
 	private SimpleChatFrameClient frame;
+	private FrameSignUser frameSignUser;
+	private boolean connexionOk = false;
+	
 	public StyledDocument documentModel=new DefaultStyledDocument();
 	DefaultListModel<String> clientListModel=new DefaultListModel<String>();
 	
@@ -124,35 +128,11 @@ public class SimpleChatClientApp {
 	}
 	
     void displayConnectionDialog() {
-    	ConnectionPanel connectionPanel=new ConnectionPanel();
-    	
-    	int result=JOptionPane.showOptionDialog(null, connectionPanel, ConnectTitle,
-				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
-				null, ConnectOptionNames, ConnectOptionNames);
-    	
-		if (result == 0) {
-			
-			System.out.println(result);
-			serverPort=Integer.parseInt(connectionPanel.getServerPortField().getText());
-			serverName=connectionPanel.getServerField().getText();
-			clientName=connectionPanel.getUserNameField().getText();
-			clientPwd=connectionPanel.getPasswordField().getText();
-			clientPseudo =connectionPanel.getPseudoField().getText();
-		
-		}
-		
-		if (result==1)
-		{
-			System.out.println(result);
-			FrameSignUser f=new FrameSignUser();
-			f.setVisible(true);
-			while (f.isActive())
-			{
-				System.out.println("a");
-			}
-
-		}
-
+    	//ConnectionPanel connectionPanel=new ConnectionPanel();
+    	frameDialog = new connectionDialog(this);
+    	frameDialog.setModal(true);
+    	frameDialog.setVisible(true);
+  	
 	}
     
     private void connectClient() {
@@ -180,12 +160,6 @@ public class SimpleChatClientApp {
 			public void run() {
 				try {
 					app.displayConnectionDialog();
-					
-					app.connectClient();
-					
-					app.displayClient();
-					
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -213,5 +187,78 @@ public class SimpleChatClientApp {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (frameDialog.creatCompte.equals(e.getSource())) {
+			serverPort=Integer.parseInt(frameDialog.cp.getServerPortField().getText());
+			serverName=frameDialog.cp.getServerField().getText();
+			frameDialog.setVisible(false);
+
+			frameSignUser = new FrameSignUser(this);
+			frameSignUser.setModal(true);
+			frameSignUser.setVisible(true);
+			if (connexionOk){
+				frameDialog.dispose();
+				clientName= frameSignUser.signLogin.getText();
+				clientPwd= frameSignUser.signPassword.getText();
+				clientPseudo = frameSignUser.signLogin.getText();
+				frameSignUser.dispose();
+				
+				connectClient();
+				displayClient();
+			}
+			else {
+				frameDialog.setVisible(true);
+			}
+		}
+		if (frameDialog.ConnOK.equals(e.getSource())) {
+			UserGestion usr = new UserGestion(frameDialog.cp.getUserNameField().getText(), frameDialog.cp.getPasswordField().getText());
+			if (usr.existeUser()){
+				
+				clientName= frameDialog.cp.getUserNameField().getText();
+				clientPwd= frameDialog.cp.getPasswordField().getText();
+				clientPseudo = frameDialog.cp.getUserNameField().getText();;
+				serverPort=Integer.parseInt(frameDialog.cp.getServerPortField().getText());
+				serverName=frameDialog.cp.getServerField().getText();
+				
+				frameDialog.dispose();
+				connectClient();
+				displayClient();
+			}
+			else{
+				JOptionPane.showMessageDialog(null,"cet utilisateur n'existe pas ou le mot de passe n'est pas correct.");
+			}
+		}
+		
+		if (frameSignUser != null) {
+			if (frameSignUser.signOk.equals(e.getSource())) {
+				if ((frameSignUser.signLogin.getText().equals("")) || (frameSignUser.signPrenom.getText().equals("")) || (frameSignUser.signPseudo.getText().equals("")) || (frameSignUser.signPassword.getText().equals("")))
+				{
+					JOptionPane.showMessageDialog(null,"Merci de compléter votre saisie.");
+				}
+				else{
+					UserGestion u=new UserGestion(frameSignUser.signLogin.getText(), frameSignUser.signPseudo.getText(), frameSignUser.signPassword.getText(), frameSignUser.signPrenom.getText(), frameSignUser.chemin.getText());
+					System.out.println("chemin : " + frameSignUser.chemin.getText() );
+					if (u.addUser()) {
+						frameSignUser.dispose();
+						connexionOk = true;
+					}
+				}
+			}
+		}
+		
+		if (frameSignUser != null)  {
+			if (frameSignUser.signCancel.equals(e.getSource())) {
+				frameSignUser.dispose();
+				connexionOk = false;
+			}
+		}
+	
+		
+		
+	}
+
 
 }

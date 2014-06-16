@@ -22,8 +22,12 @@ public class UserGestion extends User {
 		super(login, pwd);
 	}
 
+	public UserGestion() {
+		super();
+	}
+
 	
-	public void addUser()
+	public boolean addUser()
 
 	{
 		// methode pour créer un USER dans la bdd via ConMySql
@@ -40,7 +44,7 @@ public class UserGestion extends User {
 				if ((this.getLogin().equals(rs.getString(1)))|| (this.getPseudo().equals(rs.getString(2))))
 				{
 					JOptionPane.showMessageDialog(null,"L'utilisateur '"+this.getLogin()+"' existe déjà.");
-					return;
+					return false;
 				}
 			}
 			String query = "INSERT INTO tusers (nom, prenom, pseudo, pwd, picture) ";
@@ -56,11 +60,13 @@ public class UserGestion extends User {
 			ps.executeUpdate();
 
 			JOptionPane.showMessageDialog(null,"User enregistré.");
+			return true;
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	public void delUser()
@@ -106,7 +112,7 @@ public class UserGestion extends User {
 
 			while (rs.next())
 			{
-				if ((rs.getString(1)==this.getLogin()) && (rs.getString(2)==this.getPwd()))
+				if ((rs.getString(1).equals(this.getLogin())) && (rs.getString(2).equals(this.getPwd())))
 				{
 					System.out.println(rs.getString(1)+"/"+rs.getString(2)+" : user authentifié.");
 					rs.close();

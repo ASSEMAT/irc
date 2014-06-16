@@ -15,6 +15,7 @@ import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,21 +27,22 @@ import javax.swing.border.LineBorder;
 
 import com.cfranc.irc.server.UserGestion;
 
-public class FrameSignUser extends JFrame {
+public class FrameSignUser extends JDialog {
 
 	private JPanel contentPane;
-	private JTextField signLogin;
-	private JTextField signPseudo;
+	public JTextField signLogin;
+	public JTextField signPseudo;
 	private JLabel lblNewLabel;
 	private JLabel lblPseudo;
 	private JLabel lblPrenom;
-	private JTextField signPrenom;
+	public JTextField signPrenom;
 	private JLabel lblMotDePasse;
-	private JTextField signPassword;
+	public JTextField signPassword;
 	private JLabel lblAvatar_1;
-//	private JPanel panelPicture;
-	private JTextField chemin;
 	private JImagePanel panelPicture ;
+	public JTextField chemin;
+	public JButton signOk ;
+	public JButton signCancel;
 
 	/**
 	 * Launch the application.
@@ -49,7 +51,7 @@ public class FrameSignUser extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					FrameSignUser frame = new FrameSignUser();
+					FrameSignUser frame = new FrameSignUser(new SimpleChatClientApp());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -61,9 +63,8 @@ public class FrameSignUser extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public FrameSignUser() {
+	public FrameSignUser(SimpleChatClientApp listener) {
 		setPreferredSize(new Dimension(500, 500));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 383);
 		contentPane = new JPanel();
 		contentPane.setPreferredSize(new Dimension(400, 500));
@@ -233,49 +234,14 @@ public class FrameSignUser extends JFrame {
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
-		JButton signOk = new JButton("OK");
-		signOk.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			if ((signLogin.getText().equals("")) || (signPrenom.getText().equals("")) || (signPseudo.getText().equals("")) || (signPassword.getText().equals("")))
-			{
-				JOptionPane.showMessageDialog(null,"Merci de compléter votre saisie.");
-				return;
-			}
-			signUser();
-			
-			}
-		});
+		signOk = new JButton("OK");
+		signOk.addActionListener(listener);
 		panel.add(signOk);
 		
-		JButton signCancel = new JButton("Annuler");
-		signCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				closeSign();		
-				
-			}
-		});
+		signCancel = new JButton("Annuler");
+		signCancel.addActionListener(listener);
 		panel.add(signCancel);
 	}
 	
-	private void signUser() {
-		
-		String nom=signLogin.getText();
-		String prenom=signPrenom.getText();
-		String pseudo=signPseudo.getText();
-		String pwd=signPassword.getText();
-		String pic=panelPicture.getComponents().toString();
-		
-		UserGestion u=new UserGestion(nom, pseudo, pwd, prenom, pic);
-		
-		u.addUser();
-		
-	}
 	
-	private void closeSign()
-	{
-		this.dispose();
-	}
-
 }

@@ -75,5 +75,9 @@ public class User {
 		this.pseudo = pseudo;
 	}
 
+	User() {
+		super();
+	}
+
 	
 }
