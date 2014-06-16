@@ -23,7 +23,8 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 	private DataOutputStream streamOut = null;
 	private DataInputStream streamIn = null;
 	private BufferedReader console = null;
-	String login,pwd, pseudo, picture;
+	String login,pwd, pseudo, picture, usrToSend;
+
 	static DefaultListModel<User> clientListModel;
 	StyledDocument documentModel;
 	
@@ -114,14 +115,15 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 	 * @see com.cfranc.irc.client.IfSenderModel#setMsgToSend(java.lang.String)
 	 */
 	@Override
-	public void setMsgToSend(String msgToSend) {
+	public void setMsgToSend(String msgToSend, String usrToSend) {
 		this.msgToSend = msgToSend;
+		this.usrToSend = usrToSend;
 	}
 
 	private boolean sendMsg() throws IOException{
 		boolean res=false;
 		if(msgToSend!=null){
-			streamOut.writeUTF("#"+pseudo+"#"+msgToSend);
+			streamOut.writeUTF("#"+pseudo+"#"+msgToSend+"#"+usrToSend+"#picture");
 			msgToSend=null;
 		    streamOut.flush();
 		    res=true;

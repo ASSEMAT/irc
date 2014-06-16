@@ -55,7 +55,7 @@ public class ConnectionPanel extends JPanel {
 	    JLabel passwordLabel = new JLabel("Password: ", JLabel.RIGHT);
 	    JLabel serverLabel = new JLabel("Server name:", JLabel.RIGHT);
 	    JLabel serverPortLabel = new JLabel("Port: ", JLabel.RIGHT);
-	    passwordField = new JPasswordField("trustworthy");
+	    passwordField = new JPasswordField("AAAAAAAAA");
 	    serverField = new JTextField("localhost");
 	    serverPortField = new JTextField("4567");
 	    GroupLayout groupLayout = new GroupLayout(this);

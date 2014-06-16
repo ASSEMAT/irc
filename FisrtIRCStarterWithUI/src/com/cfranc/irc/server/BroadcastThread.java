@@ -51,14 +51,32 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 		return res;
 	}
 
-	public static void sendMessage(User sender, String msg){
+	public static void sendMessage(User sender, String msg, String usr, String ico){
 		Collection<ServerToClientThread> clientTreads=clientTreadsMap.values();
 		Iterator<ServerToClientThread> receiverClientThreadIterator=clientTreads.iterator();
-		while (receiverClientThreadIterator.hasNext()) {
-			ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
-			clientThread.post("#"+sender.getPseudo()+"#"+msg);
-			System.out.println("sendMessage : "+"#"+sender.getLogin()+"#"+msg);
+		
+		if (usr.equals(""))
+		{
+			System.out.println("message pour tous");
+			while (receiverClientThreadIterator.hasNext()) {
+				ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
+				clientThread.post("#"+sender.getPseudo()+"#"+msg+"#"+usr+"#"+ico);
+				System.out.println("sendMessage : "+"#"+sender.getLogin()+"#"+msg+"#"+usr+"#"+ico);
+			}
+		} else
+		{
+			System.out.println("message privé pour " + usr);
+			Collection<User> users=clientTreadsMap.keySet();
+			for (User user : users) {
+				if (user.getPseudo().equals(usr)){
+					ServerToClientThread clientThread = clientTreadsMap.get(user);
+					clientThread.post("#"+sender.getPseudo()+"#"+msg+"#"+usr+"#"+ico);
+				}
+			}
+			
 		}
+		
+		
 	}
 	
 	public static void removeClient(User user){
