@@ -23,7 +23,7 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 	private DataOutputStream streamOut = null;
 	private DataInputStream streamIn = null;
 	private BufferedReader console = null;
-	String login,pwd, pseudo, picture, usrToSend;
+	public String login,pwd, pseudo, picture, usrToSend;
 
 	static DefaultListModel<User> clientListModel;
 	StyledDocument documentModel;

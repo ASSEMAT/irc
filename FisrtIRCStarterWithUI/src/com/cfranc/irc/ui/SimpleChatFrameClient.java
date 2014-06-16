@@ -10,7 +10,6 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -49,6 +48,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 
+import com.cfranc.irc.IfClientServerProtocol;
 import com.cfranc.irc.client.IfSenderModel;
 import com.cfranc.irc.server.User;
 
@@ -70,9 +70,11 @@ public class SimpleChatFrameClient extends JFrame {
 	private final ResourceAction AffichageToolbarAction = new AffichageToolbarAction();
 	private  JImagePanel panelPicture;
 	private String pseudoReception="";
+	private String pseudo="";
 	
 	private boolean isScrollLocked=true;
 
+	
 	/**
 	 * Launch the application.
 	 * @throws BadLocationException 
@@ -110,6 +112,7 @@ public class SimpleChatFrameClient extends JFrame {
 	public void sendMessage() {
 		System.out.println("send message : " +  pseudoReception);
 		sender.setMsgToSend(textField.getText(),pseudoReception);
+
 	}
 
 	public void close() {
@@ -117,14 +120,16 @@ public class SimpleChatFrameClient extends JFrame {
 	}
 
 	public SimpleChatFrameClient() {
-		this(null, new DefaultListModel<User>(), SimpleChatClientApp.defaultDocumentModel());
+		this(null, new DefaultListModel<User>(), SimpleChatClientApp.defaultDocumentModel(),IfClientServerProtocol.MESSAGE_ALL_USERS);
 	}
 
 	/**
 	 * Create the frame.
 	 */
-	public SimpleChatFrameClient(IfSenderModel sender, ListModel<User> clientListModel, Document documentModel) {
+	public SimpleChatFrameClient(IfSenderModel sender, ListModel<User> clientListModel, Document documentModel, String clientPseudo) {
 		this.sender=sender;
+		this.pseudo = clientPseudo;
+		
 		this.documentModel=documentModel;
 		this.listModel=clientListModel;
 		setTitle(Messages.getString("SimpleChatFrameClient.4")); //$NON-NLS-1$
@@ -180,10 +185,22 @@ public class SimpleChatFrameClient extends JFrame {
 				int iFirstSelectedElement=((JList)e.getSource()).getSelectedIndex();
 				if(iFirstSelectedElement>=0 && iFirstSelectedElement<listModel.getSize()){
 					senderName=listModel.getElementAt(iFirstSelectedElement).getPseudo();
-					getLblSender().setText(senderName);
+					//getLblSender().setText(senderName);
 					getPanelPicture().setImage(new ImageIcon(listModel.getElementAt(iFirstSelectedElement).getPic()).getImage());
 					repaint();
-					pseudoReception = senderName;
+					if (!senderName.equals(pseudo)){
+						pseudoReception = senderName;
+						getLblSender().setText(senderName);
+//						lbltypeMessage1.setText(Messages.getString("SimpleChatFrameClient.21") + " " + senderName);
+						getLblSender().setText(Messages.getString("SimpleChatFrameClient.21") + " " + senderName);
+					}
+					else
+					{
+						pseudoReception = IfClientServerProtocol.MESSAGE_ALL_USERS;
+//						lbltypeMessage1.setText(Messages.getString("SimpleChatFrameClient.20") + " " + senderName);
+						getLblSender().setText(Messages.getString("SimpleChatFrameClient.20") + " " + senderName);
+
+					}
 				}
 				else{
 					getLblSender().setText("?"); //$NON-NLS-1$
@@ -251,16 +268,16 @@ public class SimpleChatFrameClient extends JFrame {
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addComponent(lblSender, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(lblSender, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField, GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+					.addComponent(textField, GroupLayout.PREFERRED_SIZE, 185, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnSend, GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE))
+					.addComponent(btnSend, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(10)
+					.addGap(20)
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(textField, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
 						.addComponent(lblSender, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)

@@ -70,7 +70,7 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 			for (User user : users) {
 				if (user.getPseudo().equals(usr)){
 					ServerToClientThread clientThread = clientTreadsMap.get(user);
-					clientThread.post("#"+sender.getPseudo()+"#"+msg+"#"+usr+"#"+ico);
+					clientThread.post("#"+sender.getPseudo()+"#private message : "+msg+"#"+usr+"#"+ico);
 				}
 			}
 			

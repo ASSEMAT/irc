@@ -75,7 +75,7 @@ public class SimpleChatClientApp implements ActionListener {
 
 		// Init GUI
 		this.frame = new SimpleChatFrameClient(clientToServerThread,
-				clientListModel, documentModel);
+				clientListModel, documentModel,clientPseudo);
 		this.frame.setTitle(this.frame.getTitle() + " : " + clientPseudo
 				+ " connected to " + serverName + ":" + serverPort);
 		this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

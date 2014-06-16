@@ -71,11 +71,11 @@ public class ServerToClientThread extends Thread{
 						System.out.println("serveur run :" + line);
 						String login=userMsg[1];
 						String msg=userMsg[2];
-						String pseudo=userMsg[3];
-						String ico=userMsg[4];
 						System.out.println("ServerToCleintThread "  + msg);
 						done = (msg.equals(".bye") || (line.startsWith(IfClientServerProtocol.DEL)));
 						if(!done){
+							String pseudo=userMsg[3];
+							String ico=userMsg[4];
 							if(login.equals(user)){
 								System.err.println("ServerToClientThread::run(), login!=user"+login);
 							}
