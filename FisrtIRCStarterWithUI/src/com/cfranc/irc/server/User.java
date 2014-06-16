@@ -53,7 +53,7 @@ public class User {
 	 * @param prenom
 	 * @param pic
 	 */
-	User(String login, String pwd, String pseudo, String prenom, String pic) {
+	public User(String login, String pwd, String pseudo, String prenom, String pic) {
 		super();
 		this.login = login;
 		this.pwd = pwd;
@@ -62,12 +62,21 @@ public class User {
 		this.pic = pic;
 	}
 
+	public User(String login, String pseudo, String pwd, String pic) {
+		super();
+		this.login = login;
+		this.pwd = pwd;
+		this.pseudo = pseudo;
+		this.pic = pic;
+	}
+	
 	User(String login, String pwd) {
 		super();
 		this.login = login;
 		this.pwd = pwd;
 	}
-	
+
+
 	User(String login, String pseudo, String pwd) {
 		super();
 		this.login = login;

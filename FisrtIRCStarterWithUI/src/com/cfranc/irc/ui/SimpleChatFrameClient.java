@@ -1,13 +1,16 @@
 package com.cfranc.irc.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -17,6 +20,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -24,9 +28,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
@@ -44,20 +50,14 @@ import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 
 import com.cfranc.irc.client.IfSenderModel;
-
-import javax.swing.JPopupMenu;
-
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JTabbedPane;
+import com.cfranc.irc.server.User;
 
 public class SimpleChatFrameClient extends JFrame {
 	
 	private static Document documentModel;
-	private static ListModel<String> listModel;
+	//private static ListModel<String> listModel;
+	private static ListModel<User> listModel;
+	
 	IfSenderModel sender;
 	private String senderName;	
 
@@ -68,6 +68,7 @@ public class SimpleChatFrameClient extends JFrame {
 	private final ResourceAction sendAction = new SendAction();
 	private final ResourceAction lockAction = new LockAction();
 	private final ResourceAction AffichageToolbarAction = new AffichageToolbarAction();
+	private  JImagePanel panelPicture;
 	
 	private boolean isScrollLocked=true;
 
@@ -114,19 +115,19 @@ public class SimpleChatFrameClient extends JFrame {
 	}
 
 	public SimpleChatFrameClient() {
-		this(null, new DefaultListModel<String>(), SimpleChatClientApp.defaultDocumentModel());
+		this(null, new DefaultListModel<User>(), SimpleChatClientApp.defaultDocumentModel());
 	}
 
 	/**
 	 * Create the frame.
 	 */
-	public SimpleChatFrameClient(IfSenderModel sender, ListModel<String> clientListModel, Document documentModel) {
+	public SimpleChatFrameClient(IfSenderModel sender, ListModel<User> clientListModel, Document documentModel) {
 		this.sender=sender;
 		this.documentModel=documentModel;
 		this.listModel=clientListModel;
 		setTitle(Messages.getString("SimpleChatFrameClient.4")); //$NON-NLS-1$
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 393);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -169,15 +170,17 @@ public class SimpleChatFrameClient extends JFrame {
 		JSplitPane splitPane = new JSplitPane();
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		JList<String> list = new JList<String>(listModel);
+		JList<User> list = new JList<User>(listModel);
 
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				int iFirstSelectedElement=((JList)e.getSource()).getSelectedIndex();
 				if(iFirstSelectedElement>=0 && iFirstSelectedElement<listModel.getSize()){
-					senderName=listModel.getElementAt(iFirstSelectedElement);
+					senderName=listModel.getElementAt(iFirstSelectedElement).getPseudo();
 					getLblSender().setText(senderName);
+					getPanelPicture().setImage(new ImageIcon(listModel.getElementAt(iFirstSelectedElement).getPic()).getImage());
+					repaint();
 				}
 				else{
 					getLblSender().setText("?"); //$NON-NLS-1$
@@ -219,6 +222,9 @@ public class SimpleChatFrameClient extends JFrame {
 		JPanel panel_1 = new JPanel();
 		contentPane.add(panel_1, BorderLayout.SOUTH);
 		panel_1.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2, BorderLayout.SOUTH);
 		
 		JPanel panel = new JPanel();
 		panel_1.add(panel);
@@ -263,12 +269,27 @@ public class SimpleChatFrameClient extends JFrame {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		
 		JButton button = toolBar.add(sendAction);
+		
+		
+		panelPicture = new JImagePanel();
+		Dimension dim = new Dimension(200, 100);
+		panelPicture.setPreferredSize(dim);
+		panelPicture.setMinimumSize(dim);
+		panelPicture.setMaximumSize(dim);
+		panelPicture.setSize(dim);
+		panel_2.add(panelPicture);
+		
 	}
 
 	public JLabel getLblSender() {
 		return lblSender;
 	}
 	
+	public JImagePanel getPanelPicture() {
+		return panelPicture;
+	}
+
+
 	private abstract class ResourceAction extends AbstractAction {
 		public ResourceAction() {
 		}

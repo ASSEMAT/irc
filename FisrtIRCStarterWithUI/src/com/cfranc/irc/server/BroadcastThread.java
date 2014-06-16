@@ -32,13 +32,13 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 			// Envoie à tous les utilisateurs de l'arrivée d'un nouvel arrivant
 			while (receiverClientThreadIterator.hasNext()) {
 				ServerToClientThread clientThread = (ServerToClientThread) receiverClientThreadIterator.next();
-				clientThread.post(ADD+user.getPseudo());
+				clientThread.post(ADD+user.getPseudo()+ SEPARATOR + user.getPic());
 			}
 			
 			// Envoie à l'arrivant de la liste des utilisateurs déjà connectés.
 			for (User userExistant  : users) {
 				if (userExistant != user) {
-					serverToClientThread.post(ADD+userExistant.getPseudo());
+					serverToClientThread.post(ADD+userExistant.getPseudo()+ SEPARATOR + userExistant.getPic());
 				}
 			}
 		}
@@ -68,7 +68,7 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 		}
 		
 		// c'est ici qu'il faudra coder la suppression du noeud dans le modèle
-		ClientConnectThread.RemoveNode(user.getLogin());
+		ClientConnectThread.RemoveNode(user.getPseudo());
 		
 	}
 	

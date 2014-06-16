@@ -127,4 +127,32 @@ public class UserGestion extends User {
 		}
 		return false;
 	}
+	
+	
+	public String getPicture()
+	{
+		// returne TRUE si le couple LOGIN et PWD est présent dans la BDD
+		
+		try {
+			Connection con=ConMySql.getInst().getConn();
+
+			Statement s=con.createStatement();
+			s.setQueryTimeout(30); 
+			System.out.println("SELECT pic  from FROM TUSERS where NOM = '" + this.getLogin() + "' AND PWD  = '" + this.getPwd() + "'");
+			ResultSet rs=s.executeQuery("SELECT picture  from TUSERS where NOM = '" + this.getLogin() + "' AND PWD  = '" + this.getPwd() + "'");
+			while (rs.next())
+			{
+				System.out.println("picture : " + rs.getString(1));
+				return rs.getString(1);				
+
+			}
+			return "";
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
+
 }

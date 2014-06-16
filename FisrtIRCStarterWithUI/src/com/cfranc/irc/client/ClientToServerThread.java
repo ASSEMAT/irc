@@ -12,21 +12,22 @@ import javax.swing.DefaultListModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.cfranc.irc.IfClientServerProtocol;
+import com.cfranc.irc.server.User;
 import com.cfranc.irc.ui.SimpleChatClientApp;
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants.Clinit;
 
 public class ClientToServerThread extends Thread implements IfSenderModel{
 	private Socket socket = null;
 	private DataOutputStream streamOut = null;
 	private DataInputStream streamIn = null;
 	private BufferedReader console = null;
-	String login,pwd, pseudo;
-	static DefaultListModel<String> clientListModel;
+	String login,pwd, pseudo, picture;
+	static DefaultListModel<User> clientListModel;
 	StyledDocument documentModel;
 	
-	public ClientToServerThread(StyledDocument documentModel, DefaultListModel<String> clientListModel, Socket socket, String login, String pwd, String pseudo) {
+	public ClientToServerThread(StyledDocument documentModel, DefaultListModel<User> clientListModel, Socket socket, String login, String pwd, String pseudo, String picture) {
 		super();
 		this.documentModel=documentModel;
 		this.clientListModel=clientListModel;
@@ -34,6 +35,7 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 		this.login=login;
 		this.pwd=pwd;
 		this.pseudo=pseudo;
+		this.picture=picture;
 	}
 
 
@@ -75,16 +77,28 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 		
 		if(line.startsWith(IfClientServerProtocol.ADD)){
 			String newUser=line.substring(IfClientServerProtocol.ADD.length());
-			if(!clientListModel.contains(newUser)){
-				clientListModel.addElement(newUser);
-				receiveMessage(newUser, " entre dans le salon...");
+			String[] result =newUser.split(IfClientServerProtocol.SEPARATOR);
+			String pseudo = result[0];
+			System.out.println(result[0]);
+			String pic = result[1];
+			User user1=new User("","", pseudo,"",pic);
+			
+			if(!clientListModel.contains(user1.getPseudo())){
+				clientListModel.addElement(user1);
+				receiveMessage(pseudo, " entre dans le salon...");
 			}
 		}
 		else if(line.startsWith(IfClientServerProtocol.DEL)){
 			String delUser=line.substring(IfClientServerProtocol.DEL.length());
-			if(clientListModel.contains(delUser)){
-				clientListModel.removeElement(delUser);
-				receiveMessage(delUser, " quite le salon !");
+			
+			for (int i=0; i < clientListModel.getSize() ; i++) {
+				System.out.println(clientListModel.getElementAt(i).getPseudo() +  " " +  delUser);
+				if (clientListModel.getElementAt(i).getPseudo().equals(delUser)) {
+					System.out.println("je passe dans supprimer");
+					clientListModel.removeElementAt(i);
+					receiveMessage(delUser, " quitte le salon !");
+					break;
+				}
 			}
 		}
 		else{
@@ -158,7 +172,7 @@ public class ClientToServerThread extends Thread implements IfSenderModel{
 			}
 			loginPwdQ = streamIn.readUTF();
 			if(loginPwdQ.equals(IfClientServerProtocol.LOGIN_PWD)){
-				streamOut.writeUTF(IfClientServerProtocol.SEPARATOR+this.login+IfClientServerProtocol.SEPARATOR+this.pseudo+IfClientServerProtocol.SEPARATOR+this.pwd);
+				streamOut.writeUTF(IfClientServerProtocol.SEPARATOR+this.login+IfClientServerProtocol.SEPARATOR+this.pseudo+IfClientServerProtocol.SEPARATOR+this.pwd+IfClientServerProtocol.SEPARATOR+this.picture);
 			}
 			while(streamIn.available()<=0){
 				Thread.sleep(100);

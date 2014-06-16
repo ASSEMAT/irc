@@ -21,6 +21,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import com.cfranc.irc.client.ClientToServerThread;
+import com.cfranc.irc.server.User;
 import com.cfranc.irc.server.UserGestion;
 
 public class SimpleChatClientApp implements ActionListener {
@@ -32,13 +33,14 @@ public class SimpleChatClientApp implements ActionListener {
     String clientName;
     String clientPwd;
     String clientPseudo;
+    String clientPicture;
     private connectionDialog frameDialog; 
 	private SimpleChatFrameClient frame;
 	private FrameSignUser frameSignUser;
 	private boolean connexionOk = false;
 	
 	public StyledDocument documentModel=new DefaultStyledDocument();
-	DefaultListModel<String> clientListModel=new DefaultListModel<String>();
+	DefaultListModel<User> clientListModel=new DefaultListModel<User>();
 	
     public static final String BOLD_ITALIC = "BoldItalic";
     public static final String GRAY_PLAIN = "Gray";
@@ -140,7 +142,7 @@ public class SimpleChatClientApp implements ActionListener {
 		try {
 			socketClientServer = new Socket(this.serverName, this.serverPort);
 			// Start connection services
-			clientToServerThread=new ClientToServerThread(documentModel, clientListModel,socketClientServer,clientName, clientPwd, clientPseudo);
+			clientToServerThread=new ClientToServerThread(documentModel, clientListModel,socketClientServer,clientName, clientPwd, clientPseudo, clientPicture);
 			clientToServerThread.start();
 
 			System.out.println("Connected: " + socketClientServer);
@@ -204,6 +206,7 @@ public class SimpleChatClientApp implements ActionListener {
 				clientName= frameSignUser.signLogin.getText();
 				clientPwd= frameSignUser.signPassword.getText();
 				clientPseudo = frameSignUser.signLogin.getText();
+				clientPicture = frameSignUser.chemin.getText();
 				frameSignUser.dispose();
 				
 				connectClient();
@@ -220,6 +223,7 @@ public class SimpleChatClientApp implements ActionListener {
 				clientName= frameDialog.cp.getUserNameField().getText();
 				clientPwd= frameDialog.cp.getPasswordField().getText();
 				clientPseudo = frameDialog.cp.getUserNameField().getText();;
+				clientPicture = usr.getPicture();  
 				serverPort=Integer.parseInt(frameDialog.cp.getServerPortField().getText());
 				serverName=frameDialog.cp.getServerField().getText();
 				

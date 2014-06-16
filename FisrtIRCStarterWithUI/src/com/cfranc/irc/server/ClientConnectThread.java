@@ -98,12 +98,23 @@ public class ClientConnectThread extends Thread implements IfClientServerProtoco
 		}
 		String reponse=dis.readUTF();
 		String[] userPwd=reponse.split(SEPARATOR);
+		System.out.println("acceptClient " + userPwd);
 		System.out.println("accept client reponse " + reponse);
 		System.out.println("accept client userPwd " + userPwd);
 		String login=userPwd[1];
 		String pseudo=userPwd[2];
 		String pwd=userPwd[3];
-		User newUser=new User(login, pseudo, pwd);
+		String picture=userPwd[4];
+		System.out.println(login);
+		System.out.println(pseudo);
+		System.out.println(pwd);
+		System.out.println(picture);
+		
+		User newUser=new User(login, pseudo, pwd, picture);
+		System.out.println(newUser.getLogin());
+		System.out.println(newUser.getPseudo());
+		System.out.println(newUser.getPwd());
+		System.out.println(newUser.getPic());
 		boolean isUserOK=authentication(newUser);
 		if(isUserOK){
 			
