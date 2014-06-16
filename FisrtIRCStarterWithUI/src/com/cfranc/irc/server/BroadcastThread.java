@@ -18,6 +18,12 @@ public class BroadcastThread extends Thread implements IfClientServerProtocol{
 	
 	public static boolean addClient(User user, ServerToClientThread serverToClientThread){
 		boolean res=true;
+		
+		System.out.println("addClient : " + user.getLogin());
+		System.out.println("addClient : " + user.getPseudo());
+		System.out.println("addClient : " + user.getPrenom());
+		System.out.println("addClient : " + user.getPwd());
+		System.out.println("addClient : " + user.getPic());
 		if(clientTreadsMap.containsKey(user)){
 			res=false;
 		}
