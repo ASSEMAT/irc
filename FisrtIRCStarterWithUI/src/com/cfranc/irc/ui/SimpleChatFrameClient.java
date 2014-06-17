@@ -10,6 +10,7 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -40,13 +41,19 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.Utilities;
 
 import com.cfranc.irc.IfClientServerProtocol;
 import com.cfranc.irc.client.IfSenderModel;
@@ -60,7 +67,7 @@ public class SimpleChatFrameClient extends JFrame {
 	
 	IfSenderModel sender;
 	private String senderName;	
-
+	private JTextPane textArea;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JLabel lblSender;
@@ -134,7 +141,7 @@ public class SimpleChatFrameClient extends JFrame {
 		this.listModel=clientListModel;
 		setTitle(Messages.getString("SimpleChatFrameClient.4")); //$NON-NLS-1$
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 393);
+		setBounds(100, 100, 750, 420);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -210,9 +217,59 @@ public class SimpleChatFrameClient extends JFrame {
 		list.setMinimumSize(new Dimension(100, 0));
 		splitPane.setLeftComponent(list);
 		
-		JTextPane textArea = new JTextPane((StyledDocument)documentModel);
+		textArea = new JTextPane((StyledDocument)documentModel);
 		textArea.setEnabled(false);
 
+		documentModel.addDocumentListener(new DocumentListener(){
+            public void insertUpdate(DocumentEvent event) {
+                final DocumentEvent e=event;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (e.getDocument() instanceof StyledDocument) {
+                            try {
+                                StyledDocument doc=(StyledDocument) e.getDocument();
+                                int start= Utilities.getRowStart(textArea,Math.max(0,e.getOffset()-1));
+                                int end=Utilities.getWordStart(textArea,e.getOffset()+e.getLength());
+                                String text=doc.getText(start, end-start);
+ 
+                                int i=text.indexOf(":)");
+                                while(i>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+i).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                        //StyleConstants.setIcon(attrs, new ImageIcon("C:/happy.jpg"));
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("biggrin.gif")));
+                                        doc.remove(start+i, 2);
+                                        doc.insertString(start+i,":)", attrs);
+                                    }
+                                    i=text.indexOf(":)", i+2);
+                                 }
+                                int i1=text.indexOf(":(");
+                                while(i1>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+i1).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                        //StyleConstants.setIcon(attrs, new ImageIcon("C:/sad.png"));
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("mad.gif")));
+                                        doc.remove(start+i1, 2);
+                                        doc.insertString(start+i1,":(", attrs);
+                                    }
+                                    i1=text.indexOf(":(", i1+2);
+                                }   
+                                
+                                
+                            } catch (BadLocationException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+            public void removeUpdate(DocumentEvent e) {
+            }
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+		
+		
 		JTabbedPane jOnglet = new JTabbedPane();
 		JScrollPane scrollPaneText=new JScrollPane(textArea);
 		jOnglet.addTab("salon général", scrollPaneText);
@@ -298,6 +355,102 @@ public class SimpleChatFrameClient extends JFrame {
 		panelPicture.setMaximumSize(dim);
 		panelPicture.setSize(dim);
 		panel_2.add(panelPicture);
+		
+		JPanel panelEmoticon = new JPanel();
+		panelEmoticon.setSize(new Dimension(350, 100));
+		panelEmoticon.setPreferredSize(new Dimension(350, 100));
+		panelEmoticon.setMinimumSize(new Dimension(350, 100));
+		panelEmoticon.setMaximumSize(new Dimension(350, 100));
+
+		
+		JImagePanel emoticon2 = new JImagePanel();
+		emoticon2.setPreferredSize(new Dimension(20, 20));
+		emoticon2.setSize(new Dimension(20, 20));
+		emoticon2.setMinimumSize(new Dimension(20, 20));
+		emoticon2.setMaximumSize(new Dimension(20, 20));
+		
+		JImagePanel emoticon4 = new JImagePanel();
+		emoticon4.setPreferredSize(new Dimension(20, 20));
+		emoticon4.setSize(new Dimension(20, 20));
+		emoticon4.setMinimumSize(new Dimension(20, 20));
+		emoticon4.setMaximumSize(new Dimension(20, 20));
+
+		System.out.println(SimpleChatFrameClient.class.getResource("send_16_16.jpg").getPath());
+		System.out.println(SimpleChatFrameClient.class.getResource("badday.gif").getPath());
+		emoticon2.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("biggrin.gif")).getImage());
+		emoticon4.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("mad.gif")).getImage());
+		panelEmoticon.add(emoticon2);
+		emoticon2.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				textField.setText(textField.getText() + " :) ");
+			}
+		});
+		panelEmoticon.add(emoticon4);
+		emoticon4.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				textField.setText(textField.getText() + " :( ");
+			}
+		});
+		
+		
+		repaint();
+		
+		panel_2.add(panelEmoticon);
+		
 		
 		this.setAlwaysOnTop(true);
 	}
