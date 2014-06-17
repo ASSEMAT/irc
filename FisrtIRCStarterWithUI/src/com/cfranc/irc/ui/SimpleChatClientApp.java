@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -20,11 +22,12 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import com.cfranc.irc.Smiley;
 import com.cfranc.irc.client.ClientToServerThread;
 import com.cfranc.irc.server.User;
 import com.cfranc.irc.server.UserGestion;
 
-public class SimpleChatClientApp implements ActionListener {
+public class SimpleChatClientApp implements ActionListener, MouseListener {
 	static String[] ConnectOptionNames = { "Connect", "Sign in" };
 	static String ConnectTitle = "Connection Information";
 	Socket socketClientServer;
@@ -74,13 +77,13 @@ public class SimpleChatClientApp implements ActionListener {
 	public void displayClient() {
 
 		// Init GUI
-		this.frame = new SimpleChatFrameClient(clientToServerThread,
-				clientListModel, documentModel,clientPseudo);
-		this.frame.setTitle(this.frame.getTitle() + " : " + clientPseudo
+		frame = new SimpleChatFrameClient(clientToServerThread,
+				clientListModel, documentModel, clientPseudo, this);
+		frame.setTitle(this.frame.getTitle() + " : " + clientPseudo
 				+ " connected to " + serverName + ":" + serverPort);
-		this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		((JFrame) this.frame).setVisible(true);
-		this.frame.addWindowListener(new WindowListener() {
+		frame.addWindowListener(new WindowListener() {
 
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -224,24 +227,23 @@ public class SimpleChatClientApp implements ActionListener {
 					.getText(), frameDialog.cp.getPasswordField().getText());
 			if (usr.existeUser()) {
 
+				clientName = frameDialog.cp.getUserNameField().getText();
+				clientPwd = frameDialog.cp.getPasswordField().getText();
+				clientPseudo = frameDialog.cp.getUserNameField().getText();
+				;
+				clientPicture = usr.getPicture();
+				serverPort = Integer.parseInt(frameDialog.cp
+						.getServerPortField().getText());
+				serverName = frameDialog.cp.getServerField().getText();
 
-					clientName = frameDialog.cp.getUserNameField().getText();
-					clientPwd = frameDialog.cp.getPasswordField().getText();
-					clientPseudo = frameDialog.cp.getUserNameField().getText();
-					;
-					clientPicture = usr.getPicture();
-					serverPort = Integer.parseInt(frameDialog.cp
-							.getServerPortField().getText());
-					serverName = frameDialog.cp.getServerField().getText();
-
-					frameDialog.dispose();
-					connectClient();
-					displayClient();
-				} else {
-					JOptionPane
-							.showMessageDialog(null,
-									"cet utilisateur n'existe pas ou le mot de passe n'est pas correct.");
-				}
+				frameDialog.dispose();
+				connectClient();
+				displayClient();
+			} else {
+				JOptionPane
+						.showMessageDialog(null,
+								"cet utilisateur n'existe pas ou le mot de passe n'est pas correct.");
+			}
 		}
 
 		if (frameSignUser != null) {
@@ -276,6 +278,69 @@ public class SimpleChatClientApp implements ActionListener {
 				connexionOk = false;
 			}
 		}
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (frame != null) {
+			// TODO Auto-generated method stub
+			System.out.println(e.getSource());
+			System.out.println(frame.getEmoticon1());
+
+			if (frame.getEmoticon1().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.BADDAY);
+			}
+
+			if (frame.getEmoticon1().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.BADDAY);
+			}
+			if (frame.getEmoticon2().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.CRY);
+			}
+			if (frame.getEmoticon3().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.HAPPY);
+			}
+			if (frame.getEmoticon4().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.LOL);
+			}
+			if (frame.getEmoticon5().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.SAD);
+			}
+			if (frame.getEmoticon6().equals(e.getSource())) {
+				frame.setTextField(frame.getTextField().getText() + " "
+						+ Smiley.HELLO);
+			}
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 

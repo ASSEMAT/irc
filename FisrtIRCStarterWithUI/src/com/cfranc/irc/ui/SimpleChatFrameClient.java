@@ -4,13 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -38,6 +38,7 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -56,11 +57,16 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.Utilities;
 
 import com.cfranc.irc.IfClientServerProtocol;
+import com.cfranc.irc.Smiley;
 import com.cfranc.irc.client.IfSenderModel;
 import com.cfranc.irc.server.User;
 
 public class SimpleChatFrameClient extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static Document documentModel;
 	//private static ListModel<String> listModel;
 	private static ListModel<User> listModel;
@@ -75,9 +81,63 @@ public class SimpleChatFrameClient extends JFrame {
 	private final ResourceAction sendAction = new SendAction();
 	private final ResourceAction lockAction = new LockAction();
 	private final ResourceAction AffichageToolbarAction = new AffichageToolbarAction();
-	private  JImagePanel panelPicture;
 	private String pseudoReception="";
 	private String pseudo="";
+	private JImagePanel emoticon1;
+	private JImagePanel emoticon2;
+	private JImagePanel emoticon3;
+	private JImagePanel emoticon4;
+	private JImagePanel emoticon5;
+	private JImagePanel emoticon6;
+	
+	public JImagePanel getEmoticon1() {
+		return emoticon1;
+	}
+
+	public void setEmoticon1(JImagePanel emoticon1) {
+		this.emoticon1 = emoticon1;
+	}
+
+	public JImagePanel getEmoticon2() {
+		return emoticon2;
+	}
+
+	public void setEmoticon2(JImagePanel emoticon2) {
+		this.emoticon2 = emoticon2;
+	}
+
+	public JImagePanel getEmoticon3() {
+		return emoticon3;
+	}
+
+	public void setEmoticon3(JImagePanel emoticon3) {
+		this.emoticon3 = emoticon3;
+	}
+
+	public JImagePanel getEmoticon4() {
+		return emoticon4;
+	}
+
+	public void setEmoticon4(JImagePanel emoticon4) {
+		this.emoticon4 = emoticon4;
+	}
+
+	public JImagePanel getEmoticon5() {
+		return emoticon5;
+	}
+
+	public void setEmoticon5(JImagePanel emoticon5) {
+		this.emoticon5 = emoticon5;
+	}
+
+	public JImagePanel getEmoticon6() {
+		return emoticon6;
+	}
+
+	public void setEmoticon6(JImagePanel emoticon6) {
+		this.emoticon6 = emoticon6;
+	}
+
 	
 	private boolean isScrollLocked=true;
 
@@ -90,7 +150,7 @@ public class SimpleChatFrameClient extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SimpleChatFrameClient frame = new SimpleChatFrameClient();
+					SimpleChatFrameClient frame = new SimpleChatFrameClient(new SimpleChatClientApp());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -126,14 +186,17 @@ public class SimpleChatFrameClient extends JFrame {
 		this.dispose();
 	}
 
-	public SimpleChatFrameClient() {
-		this(null, new DefaultListModel<User>(), SimpleChatClientApp.defaultDocumentModel(),IfClientServerProtocol.MESSAGE_ALL_USERS);
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public SimpleChatFrameClient(SimpleChatClientApp listener) {
+		this(null, new DefaultListModel<User>(), SimpleChatClientApp.defaultDocumentModel(),IfClientServerProtocol.MESSAGE_ALL_USERS,listener);
 	}
 
 	/**
 	 * Create the frame.
 	 */
-	public SimpleChatFrameClient(IfSenderModel sender, ListModel<User> clientListModel, Document documentModel, String clientPseudo) {
+	public SimpleChatFrameClient(IfSenderModel sender, ListModel<User> clientListModel, Document documentModel, String clientPseudo, SimpleChatClientApp listener) {
 		this.sender=sender;
 		this.pseudo = clientPseudo;
 		
@@ -185,26 +248,35 @@ public class SimpleChatFrameClient extends JFrame {
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
 		JList<User> list = new JList<User>(listModel);
-
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setCellRenderer(new ListCellRenderer<User>() {
+			@Override
+			public Component getListCellRendererComponent(JList<? extends User> list, User value, int index,boolean isSelected, boolean cellHasFocus) {
+				// TODO Auto-generated method stub
+				JLabel avatar = new JLabel(value.getPseudo());
+				ImageIcon imgUser = new ImageIcon(value.getPic());
+				Image imgReduite = imgUser.getImage().getScaledInstance(60, 30, java.awt.Image.SCALE_SMOOTH);
+				avatar.setIcon(new ImageIcon(imgReduite));
+				System.out.println("value.getLogin() "  + value.getLogin());
+				System.out.println("value.getPseudo() "  + value.getPseudo());
+				avatar.setText(value.getPseudo());
+				return avatar;
+			}
+		});
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				int iFirstSelectedElement=((JList)e.getSource()).getSelectedIndex();
 				if(iFirstSelectedElement>=0 && iFirstSelectedElement<listModel.getSize()){
 					senderName=listModel.getElementAt(iFirstSelectedElement).getPseudo();
-					//getLblSender().setText(senderName);
-					getPanelPicture().setImage(new ImageIcon(listModel.getElementAt(iFirstSelectedElement).getPic()).getImage());
-					repaint();
+
 					if (!senderName.equals(pseudo)){
 						pseudoReception = senderName;
 						getLblSender().setText(senderName);
-//						lbltypeMessage1.setText(Messages.getString("SimpleChatFrameClient.21") + " " + senderName);
 						getLblSender().setText(Messages.getString("SimpleChatFrameClient.21") + " " + senderName);
 					}
 					else
 					{
 						pseudoReception = IfClientServerProtocol.MESSAGE_ALL_USERS;
-//						lbltypeMessage1.setText(Messages.getString("SimpleChatFrameClient.20") + " " + senderName);
 						getLblSender().setText(Messages.getString("SimpleChatFrameClient.20") + " " + senderName);
 
 					}
@@ -232,27 +304,70 @@ public class SimpleChatFrameClient extends JFrame {
                                 int end=Utilities.getWordStart(textArea,e.getOffset()+e.getLength());
                                 String text=doc.getText(start, end-start);
  
-                                int i=text.indexOf(":)");
+                                int i=text.indexOf(Smiley.HAPPY);
                                 while(i>=0) {
                                     final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+i).getAttributes());
                                     if (StyleConstants.getIcon(attrs)==null) {
-                                        //StyleConstants.setIcon(attrs, new ImageIcon("C:/happy.jpg"));
-                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("biggrin.gif")));
-                                        doc.remove(start+i, 2);
-                                        doc.insertString(start+i,":)", attrs);
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("happy.gif")));
+                                        doc.remove(start+i, 3);
+                                        doc.insertString(start+i,Smiley.HAPPY, attrs);
                                     }
-                                    i=text.indexOf(":)", i+2);
+                                    i=text.indexOf(Smiley.HAPPY, i+3);
                                  }
-                                int i1=text.indexOf(":(");
-                                while(i1>=0) {
-                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+i1).getAttributes());
+                                
+                                int isad=text.indexOf(Smiley.SAD);
+                                while(isad>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+isad).getAttributes());
                                     if (StyleConstants.getIcon(attrs)==null) {
-                                        //StyleConstants.setIcon(attrs, new ImageIcon("C:/sad.png"));
-                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("mad.gif")));
-                                        doc.remove(start+i1, 2);
-                                        doc.insertString(start+i1,":(", attrs);
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("sad.gif")));
+                                        doc.remove(start+isad, 3);
+                                        doc.insertString(start+isad,Smiley.SAD, attrs);
                                     }
-                                    i1=text.indexOf(":(", i1+2);
+                                    isad=text.indexOf(Smiley.SAD, isad+3);
+                                }   
+                                
+                                int ilol=text.indexOf(Smiley.LOL);
+                                while(ilol>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+ilol).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("lol.gif")));
+                                        doc.remove(start+ilol, 3);
+                                        doc.insertString(start+ilol,Smiley.LOL, attrs);
+                                    }
+                                    ilol=text.indexOf(Smiley.LOL, ilol+3);
+                                }   
+                                
+                                int icry=text.indexOf(Smiley.CRY);
+                                while(icry>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+icry).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("cry.gif")));
+                                        doc.remove(start+icry, 3);
+                                        doc.insertString(start+icry,Smiley.CRY, attrs);
+                                    }
+                                    icry=text.indexOf(Smiley.CRY, icry+3);
+                                }   
+                                
+                                int ibadday=text.indexOf(Smiley.BADDAY);
+                                while(ibadday>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+ibadday).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("badday.gif")));
+                                        doc.remove(start+ibadday, 3);
+                                        doc.insertString(start+ibadday,Smiley.BADDAY, attrs);
+                                    }
+                                    ibadday=text.indexOf(Smiley.BADDAY, ibadday+3);
+                                }   
+                                
+                                int ihello=text.indexOf(Smiley.HELLO);
+                                while(ihello>=0) {
+                                    final SimpleAttributeSet attrs=new SimpleAttributeSet(doc.getCharacterElement(start+ihello).getAttributes());
+                                    if (StyleConstants.getIcon(attrs)==null) {
+                                    	StyleConstants.setIcon(attrs, new ImageIcon(SimpleChatFrameClient.class.getResource("welcome.gif")));
+                                        doc.remove(start+ihello, 3);
+                                        doc.insertString(start+ihello,Smiley.HELLO, attrs);
+                                    }
+                                    ihello=text.indexOf(Smiley.HELLO, ihello+3);
                                 }   
                                 
                                 
@@ -346,15 +461,7 @@ public class SimpleChatFrameClient extends JFrame {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		
 		JButton button = toolBar.add(sendAction);
-		
-		
-		panelPicture = new JImagePanel();
 		Dimension dim = new Dimension(200, 100);
-		panelPicture.setPreferredSize(dim);
-		panelPicture.setMinimumSize(dim);
-		panelPicture.setMaximumSize(dim);
-		panelPicture.setSize(dim);
-		panel_2.add(panelPicture);
 		
 		JPanel panelEmoticon = new JPanel();
 		panelEmoticon.setSize(new Dimension(350, 100));
@@ -362,90 +469,63 @@ public class SimpleChatFrameClient extends JFrame {
 		panelEmoticon.setMinimumSize(new Dimension(350, 100));
 		panelEmoticon.setMaximumSize(new Dimension(350, 100));
 
+		emoticon1 = new JImagePanel();
+		emoticon1.setPreferredSize(new Dimension(60, 60));
+		emoticon1.setSize(new Dimension(60, 60));
+		emoticon1.setMinimumSize(new Dimension(60, 60));
+		emoticon1.setMaximumSize(new Dimension(60, 60));
 		
-		JImagePanel emoticon2 = new JImagePanel();
+		emoticon2 = new JImagePanel();
 		emoticon2.setPreferredSize(new Dimension(20, 20));
 		emoticon2.setSize(new Dimension(20, 20));
 		emoticon2.setMinimumSize(new Dimension(20, 20));
 		emoticon2.setMaximumSize(new Dimension(20, 20));
-		
-		JImagePanel emoticon4 = new JImagePanel();
+
+		emoticon3 = new JImagePanel();
+		emoticon3.setPreferredSize(new Dimension(20, 20));
+		emoticon3.setSize(new Dimension(20, 20));
+		emoticon3.setMinimumSize(new Dimension(20, 20));
+		emoticon3.setMaximumSize(new Dimension(20, 20));
+
+		emoticon4 = new JImagePanel();
 		emoticon4.setPreferredSize(new Dimension(20, 20));
 		emoticon4.setSize(new Dimension(20, 20));
 		emoticon4.setMinimumSize(new Dimension(20, 20));
 		emoticon4.setMaximumSize(new Dimension(20, 20));
 
+		emoticon5 = new JImagePanel();
+		emoticon5.setPreferredSize(new Dimension(20, 20));
+		emoticon5.setSize(new Dimension(20, 20));
+		emoticon5.setMinimumSize(new Dimension(20, 20));
+		emoticon5.setMaximumSize(new Dimension(20, 20));
+
+
+		emoticon6 = new JImagePanel();
+		emoticon6.setPreferredSize(new Dimension(50, 50));
+		emoticon6.setSize(new Dimension(50, 50));
+		emoticon6.setMinimumSize(new Dimension(50, 50));
+		emoticon6.setMaximumSize(new Dimension(50, 50));
+
 		System.out.println(SimpleChatFrameClient.class.getResource("send_16_16.jpg").getPath());
 		System.out.println(SimpleChatFrameClient.class.getResource("badday.gif").getPath());
-		emoticon2.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("biggrin.gif")).getImage());
-		emoticon4.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("mad.gif")).getImage());
+		emoticon1.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("badday.gif")).getImage());
+		emoticon2.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("cry.gif")).getImage());
+		emoticon3.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("happy.gif")).getImage());
+		emoticon4.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("lol.gif")).getImage());
+		emoticon5.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("sad.gif")).getImage());
+		emoticon6.setImage(new ImageIcon(SimpleChatFrameClient.class.getResource("welcome.gif")).getImage());
+		panelEmoticon.add(emoticon1);
+		emoticon1.addMouseListener(listener);
 		panelEmoticon.add(emoticon2);
-		emoticon2.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				textField.setText(textField.getText() + " :) ");
-			}
-		});
+		emoticon2.addMouseListener(listener);
+		panelEmoticon.add(emoticon3);
+		emoticon3.addMouseListener(listener);			
 		panelEmoticon.add(emoticon4);
-		emoticon4.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				textField.setText(textField.getText() + " :( ");
-			}
-		});
-		
+		emoticon4.addMouseListener(listener);			
+		panelEmoticon.add(emoticon5);
+		emoticon5.addMouseListener(listener);			
+		panelEmoticon.add(emoticon6);
+		emoticon6.addMouseListener(listener);			
 		
 		repaint();
 		
@@ -455,13 +535,18 @@ public class SimpleChatFrameClient extends JFrame {
 		this.setAlwaysOnTop(true);
 	}
 
+	public JTextField getTextField() {
+		return textField;
+	}
+
+	public void setTextField(String str) {
+		this.textField.setText(str);
+	}
+
 	public JLabel getLblSender() {
 		return lblSender;
 	}
 	
-	public JImagePanel getPanelPicture() {
-		return panelPicture;
-	}
 
 
 	private abstract class ResourceAction extends AbstractAction {
